@@ -4,23 +4,36 @@ const cors    = require('cors');
 var crypto    = require('crypto');
 var fileName = null;
 const multer  = require('multer');//mutipart/data-format
+// const fileCert = multer({ dest: './publics/file/' });
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'publics/file')
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' +file.originalname)
+    fileName = Date.now() + '-' +file.originalname;
+    cb(null, fileName)
     // fileName=Date.now() + '-' +file.originalname;
+   
 }
 })
-
-// const fileCert = multer({ dest: './publics/file/' });
-var upload = multer({storage}).single('file');
+var upload = multer({storage});
 const router  = express.Router();
 router.use(cors()); 
 const bodyPar = require('body-parser');
 router.use( bodyPar.json() ); 
 router.use(bodyPar.urlencoded({ extended: true })); 
+// var cpUpload = fileCert.fields([{ name: 'file', maxCount: 8 }]);
+router.post('/add_certificate',upload.single('file'),async(req, res)=>{
+    // console.log(fileName);
+ try {
+     const seeker_id = req.body.seeker_id;
+     var insert = "insert into seeker_certificate (seeker_cert_name,seeker_cert_file,seeker_cert_description,seeker_id ) values('"+req.body.name+"','"+'file/'+fileName+"','"+req.body.description+"','"+seeker_id+"') RETURNING seeker_cert_id";
+     const result_insert =  await pool.query(insert);
+    res.status(200).json(result_insert.rows);   
+    } catch(err){
+     console.log(err.message);
+ }
+});
 router.post('/signup',async(req, res)=>{
  try {
      const cryptoSha1 = crypto.createHash('sha1');
@@ -35,6 +48,7 @@ router.post('/signup',async(req, res)=>{
      console.log(err.message);
  }
 });
+
 router.post('/update_profile',async(req, res)=>{
  try {
      const seeker_id = req.body.seeker_id;
@@ -96,21 +110,7 @@ router.post('/add_training',async(req, res)=>{
      console.log(err.message);
  }
 });
-// var cpUpload = fileCert.fields([{ name: 'file', maxCount: 8 }]);
-router.post('/add_certificate',async(req, res)=>{
-    upload(req, res, function (err){
-        // console.log(res.send(res.file));
-        });
- try {
-    // console.log(req.file);
-     const seeker_id = req.body.seeker_id;
-     var insert = "insert into seeker_certificate (seeker_cert_name,seeker_cert_file,seeker_cert_description,seeker_id ) values('"+req.body.name+"','"+''+"','"+req.body.description+"','"+seeker_id+"') RETURNING seeker_cert_id";
-     const result_insert =  await pool.query(insert);
-    res.status(200).json(result_insert.rows);   
-    } catch(err){
-     console.log(err.message);
- }
-});
+
 router.post('/add_reference',async(req, res)=>{
  try {
      const seeker_id = req.body.seeker_id;

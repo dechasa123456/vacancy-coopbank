@@ -94,4 +94,5 @@ router.get('/my_applied/:id',async(req, res)=>{
  }
 });
 
+
 module.exports = router;

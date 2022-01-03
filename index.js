@@ -17,6 +17,10 @@ app.use(bodyPar.urlencoded({ extended: true })); // for parsing application/x-ww
 app.get('/test', (req, res) => {
     res.send(pool);
 })
+app.get('/kooo', (req, res) => {
+    res.send('test again');
+})
 
-const port = process.env.PORT || 3001;
+
+const port = process.env.PORT || 3008;
 app.listen(port,()=>{console.log(`${port} is loading test express of node`)});
